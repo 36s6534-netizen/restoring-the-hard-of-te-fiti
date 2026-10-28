@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE HEART OF TE FITI - Wayfinder Carbon Voyage</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Gowun+Dodum&family=Jua&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        oceanDeep: '#061D2A',
+                        oceanBlue: '#0E3A53',
+                        coralReef: '#00B4D8',
+                        heartGreen: '#10B981',
+                        heartGlow: '#34D399',
+                        sandGold: '#F4A261',
+                        woodBrown: '#3D2612',
+                        woodBorder: '#8D5B28'
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        gowun: ['Gowun Dodum', 'sans-serif'],
+                        jua: ['Jua', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background-color: #061D2A;
+            background-image:
+                radial-gradient(circle at 50% 20%, rgba(0, 180, 216, 0.25) 0%, transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 50%);
+            color: #F3F4F6;
+            user-select: none;
+            min-height: 100vh;
+        }
+
+        .moana-card {
+            background: linear-gradient(145deg, rgba(14, 58, 83, 0.92) 0%, rgba(6, 29, 42, 0.95) 100%);
+            border: 3px solid #8D5B28;
+            border-radius: 28px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 180, 216, 0.15);
+            backdrop-filter: blur(8px);
+        }
+
+        .heart-swirl {
+            filter: drop-shadow(0 0 12px #34D399);
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 10px #34D399); }
+            50% { transform: scale(1.06) rotate(6deg); filter: drop-shadow(0 0 22px #6EE7B7); }
+        }
+
+        .ocean-btn {
+            background: linear-gradient(180deg, #F4A261 0%, #E76F51 100%);
+            border: 2px solid #8D5B28;
+            border-radius: 999px;
+            box-shadow: 0 4px 0 #3D2612;
+            transition: all 0.15s ease;
+        }
+
+        .ocean-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #3D2612;
+        }
+
+        .green-btn {
+            background: linear-gradient(180deg, #10B981 0%, #059669 100%);
+            border: 2px solid #064E3B;
+            border-radius: 999px;
+            box-shadow: 0 4px 0 #022C22;
+            transition: all 0.15s ease;
+        }
+
+        .green-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #022C22;
+        }
+
+        .slide-page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.35s ease-in-out;
+        }
+
+        .slide-page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #061D2A; }
+        ::-webkit-scrollbar-thumb { background: #00B4D8; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex flex-col justify-between overflow-x-hidden p-2 sm:p-4">
+
+    <!-- Top Header Navigation -->
+    <header class="w-full max-w-2xl mx-auto pt-2 pb-2">
+        <div class="flex items-center justify-between bg-oceanBlue/80 backdrop-blur-md px-5 py-3 rounded-full border-2 border-woodBorder shadow-lg">
+            <div class="flex items-center gap-2">
+                <svg class="w-7 h-7 heart-swirl" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#10B981" stroke-width="8"/>
+                    <path d="M50 20 C30 20 20 40 35 60 C45 72 50 80 50 80 C50 80 55 72 65 60 C80 40 70 20 50 20 Z" fill="#34D399"/>
+                </svg>
+                <span class="font-cinzel text-lg sm:text-xl font-black text-sandGold tracking-wider">TE FITI VOYAGE</span>
+            </div>
+
+            <!-- Page Indicators -->
+            <div class="flex items-center gap-1.5" id="pageDots">
+                <div class="dot w-5 h-3 rounded-full bg-coralReef transition-all duration-300"></div>
+                <div class="dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300"></div>
+                <div class="dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300"></div>
+                <div class="dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300"></div>
+                <div class="dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Slide Vessel -->
+    <main class="w-full max-w-2xl mx-auto my-auto py-2 flex-grow flex flex-col justify-center">
+
+        <!-- ================= SLIDE 1: INTRO ================= -->
+        <div id="slide-1" class="slide-page active space-y-4">
+            <div class="moana-card p-6 sm:p-8 text-center space-y-5 relative overflow-hidden">
+                <div class="relative w-full h-40 sm:h-48 rounded-2xl overflow-hidden border-2 border-woodBorder shadow-inner mb-2">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" alt="Moana Ocean Voyage" class="w-full h-full object-cover brightness-90">
+                    <div class="absolute inset-0 bg-gradient-to-t from-oceanDeep via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-0 right-0 px-4 flex justify-between items-end">
+                        <span class="font-cinzel font-black text-sandGold text-sm tracking-widest drop-shadow">WAYFINDER LOG</span>
+                        <span class="text-xs text-emerald-300 font-bold bg-oceanDeep/80 px-2.5 py-1 rounded-full border border-emerald-500/50">KOSIS DATA 📊</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h1 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-sandGold tracking-wide">
+                        THE HEART OF TE FITI
+                    </h1>
+                    <p class="font-jua text-lg text-emerald-300">
+                        "모아나와 함께 떠나는 나만의 탄소 항해기 🌊"
+                    </p>
+                </div>
+
+                <div class="bg-oceanDeep/80 p-4 rounded-2xl border border-coralReef/40 text-left space-y-2">
+                    <div class="flex items-center gap-2 text-sandGold font-bold text-xs sm:text-sm">
+                        <span>🌺</span> <span>대한민국 1인당 하루 탄소 배출량 브리핑</span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        국가 온실가스 통계에 따르면 우리나라 1인당 연간 배출량은 <b>13.68톤</b>!<br/>
+                        이를 하루로 환산하면 약 <b class="text-coralReef text-sm">37.5kg CO₂</b>에 달합니다.<br/>
+                        나의 하루 생활 습관은 테 피티의 심장을 얼마나 지키고 있을까요?
+                    </p>
+                </div>
+
+                <button onclick="nextSlide()" class="ocean-btn w-full py-3.5 font-jua text-white font-bold text-base flex items-center justify-center gap-2">
+                    <span>⛵ 항해 시작하기 (START VOYAGE)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 2: QUIZ ================= -->
+        <div id="slide-2" class="slide-page space-y-4">
+            <div class="moana-card p-6 space-y-4">
+                <div class="flex justify-between items-center border-b border-woodBorder/60 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">🌴</span>
+                        <h2 class="font-cinzel font-bold text-xl text-sandGold">WAYFINDER LOG</h2>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-300 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-500/40">5 QUESTIONS</span>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <!-- Q1 -->
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-sandGold block">1. 등하교 교통수단은 무엇을 이용하나요?</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setQuiz('trans', 0.5, this)" class="q-btn border-2 border-emerald-400 bg-emerald-900/60 font-bold text-emerald-200 rounded-xl p-2.5">🚲 도보/자전거</button>
+                            <button onclick="setQuiz('trans', 4.5, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">🚌 대중교통</button>
+                            <button onclick="setQuiz('trans', 12.0, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">🚗 승용차/택시</button>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-sandGold block">2. 교실과 방 냉난방 이용 습관은?</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setQuiz('energy', 2.0, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">적정온도 준수</button>
+                            <button onclick="setQuiz('energy', 6.5, this)" class="q-btn border-2 border-emerald-400 bg-emerald-900/60 font-bold text-emerald-200 rounded-xl p-2.5">평범하게 사용</button>
+                            <button onclick="setQuiz('energy', 12.0, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">강하게 틀어둠</button>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-sandGold block">3. 급식 잔반 및 음식 소비 습관은?</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setQuiz('food', 3.0, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">잔반 안 남김</button>
+                            <button onclick="setQuiz('food', 7.0, this)" class="q-btn border-2 border-emerald-400 bg-emerald-900/60 font-bold text-emerald-200 rounded-xl p-2.5">조금 남김</button>
+                            <button onclick="setQuiz('food', 13.0, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">자주 남김</button>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-sandGold block">4. 텀블러 및 다회용 컵 사용 빈도는?</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setQuiz('cup', 0.5, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">매일 사용</button>
+                            <button onclick="setQuiz('cup', 2.5, this)" class="q-btn border-2 border-emerald-400 bg-emerald-900/60 font-bold text-emerald-200 rounded-xl p-2.5">가끔 사용</button>
+                            <button onclick="setQuiz('cup', 6.0, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">일회용 위주</button>
+                        </div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="space-y-1.5">
+                        <label class="font-bold text-sandGold block">5. 이메일 정리 등 디지털 습관은?</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setQuiz('digital', 0.5, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">자주 비움</button>
+                            <button onclick="setQuiz('digital', 2.0, this)" class="q-btn border-2 border-emerald-400 bg-emerald-900/60 font-bold text-emerald-200 rounded-xl p-2.5">보통 사용</button>
+                            <button onclick="setQuiz('digital', 4.5, this)" class="q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef">정리 안 함</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="prevSlide()" class="w-1/3 py-3 rounded-full bg-oceanDeep border border-slate-600 text-slate-300 font-bold text-xs">PREV</button>
+                    <button onclick="calculateAndNext()" class="green-btn w-2/3 py-3 text-white font-bold text-xs">CHECK RESULT 📊</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 3: VISUAL COMPARISON ================= -->
+        <div id="slide-3" class="slide-page space-y-4">
+            <div class="moana-card p-6 space-y-4">
+                <div class="text-center space-y-1">
+                    <span id="badgePersona" class="inline-block px-3 py-1 bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 rounded-full text-xs font-bold">
+                        🌊 OCEAN WAYFINDER
+                    </span>
+                    <h2 class="font-cinzel text-xl font-extrabold text-sandGold">DAILY CARBON REPORT</h2>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-oceanDeep/80 p-3 rounded-2xl border border-coralReef/50">
+                        <span class="text-[11px] text-slate-400 block">나의 하루 배출량</span>
+                        <div class="text-2xl font-extrabold text-coralReef my-0.5">
+                            <span id="myDailyVal">22.5</span> <span class="text-xs font-normal">kg</span>
+                        </div>
+                    </div>
+                    <div class="bg-oceanDeep/80 p-3 rounded-2xl border border-sandGold/50">
+                        <span class="text-[11px] text-slate-400 block">대한민국 하루 평균</span>
+                        <div class="text-2xl font-extrabold text-sandGold my-0.5">
+                            <span>37.5</span> <span class="text-xs font-normal">kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart.js Container -->
+                <div class="bg-oceanDeep/90 p-3 rounded-2xl border border-woodBorder/50">
+                    <div class="h-44 relative">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-emerald-950/60 p-3 rounded-2xl border border-emerald-500/40 text-center">
+                    <p class="text-xs text-slate-200" id="comparisonResultText">
+                        대한민국 하루 평균 대비 <b class="text-emerald-400">60%</b> 수준을 배출하고 있습니다! ⛵
+                    </p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="prevSlide()" class="w-1/3 py-3 rounded-full bg-oceanDeep border border-slate-600 text-slate-300 font-bold text-xs">PREV</button>
+                    <button onclick="nextSlide()" class="green-btn w-2/3 py-3 text-white font-bold text-xs">TAKE ACTION 🌺</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 4: ACTION SIMULATOR ================= -->
+        <div id="slide-4" class="slide-page space-y-4">
+            <div class="moana-card p-6 space-y-4">
+                <div class="flex justify-between items-center border-b border-woodBorder/60 pb-2">
+                    <h2 class="font-cinzel text-xl font-extrabold text-sandGold">RESTORE TE FITI</h2>
+                    <span class="text-xs text-emerald-300 font-bold">REDUCTION PLAN</span>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <label class="flex items-center justify-between p-3 bg-oceanDeep/80 rounded-2xl border border-slate-700 cursor-pointer hover:border-emerald-500">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">🚌</span>
+                            <span class="font-bold text-slate-200">자가용 대신 대중교통/도보 이용하기</span>
+                        </div>
+                        <input type="checkbox" id="act1" checked onchange="runSim()" class="w-5 h-5 accent-emerald-500">
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 bg-oceanDeep/80 rounded-2xl border border-slate-700 cursor-pointer hover:border-emerald-500">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">❄️</span>
+                            <span class="font-bold text-slate-200">냉난방 적정온도 유지 & 안 쓰는 플러그 뽑기</span>
+                        </div>
+                        <input type="checkbox" id="act2" checked onchange="runSim()" class="w-5 h-5 accent-emerald-500">
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 bg-oceanDeep/80 rounded-2xl border border-slate-700 cursor-pointer hover:border-emerald-500">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">🍱</span>
+                            <span class="font-bold text-slate-200">학교 급식 잔반 안 남기기 (그린 급식)</span>
+                        </div>
+                        <input type="checkbox" id="act3" checked onchange="runSim()" class="w-5 h-5 accent-emerald-500">
+                    </label>
+
+                    <label class="flex items-center justify-between p-3 bg-oceanDeep/80 rounded-2xl border border-slate-700 cursor-pointer hover:border-emerald-500">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">🥤</span>
+                            <span class="font-bold text-slate-200">일회용 컵 대신 개인 텀블러 사용하기</span>
+                        </div>
+                        <input type="checkbox" id="act4" onchange="runSim()" class="w-5 h-5 accent-emerald-500">
+                    </label>
+                </div>
+
+                <!-- Simulation Output -->
+                <div class="bg-gradient-to-r from-oceanBlue to-emerald-950 p-4 rounded-2xl border border-emerald-500/40 text-center space-y-1">
+                    <span class="text-xs text-slate-300">오늘 하루 감축 예상량</span>
+                    <div class="text-3xl font-extrabold text-emerald-300">
+                        <span id="simReducedKg">3.20</span> <span class="text-sm font-normal">kg CO₂</span>
+                    </div>
+                    <span class="text-xs text-sandGold font-bold block">
+                        🌴 연간 소나무 약 <span id="simTreeVal">17.7</span> 그루를 심는 효과!
+                    </span>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="prevSlide()" class="w-1/3 py-3 rounded-full bg-oceanDeep border border-slate-600 text-slate-300 font-bold text-xs">PREV</button>
+                    <button onclick="nextSlide()" class="green-btn w-2/3 py-3 text-white font-bold text-xs">WAYFINDER PLEDGE 📜</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 5: PLEDGE CARD ================= -->
+        <div id="slide-5" class="slide-page space-y-4">
+            <div class="moana-card p-6 space-y-4 text-center">
+                <div class="space-y-1">
+                    <h2 class="font-cinzel text-xl font-extrabold text-sandGold">WAYFINDER PLEDGE</h2>
+                    <p class="text-xs text-slate-300">항해사 이름을 입력하고 나만의 실천 서약서를 발급받으세요!</p>
+                </div>
+
+                <div class="flex items-center gap-2 max-w-xs mx-auto">
+                    <span class="text-xs font-bold text-sandGold whitespace-nowrap">항해사 이름:</span>
+                    <input type="text" id="studentName" value="모아나" oninput="updateCard()" class="w-full px-3 py-1.5 bg-oceanDeep border border-woodBorder rounded-xl text-xs text-center text-emerald-300 focus:outline-none focus:border-emerald-400">
+                </div>
+
+                <!-- Certificate Card -->
+                <div id="cardBox" class="bg-gradient-to-b from-oceanBlue to-oceanDeep p-5 rounded-2xl border-2 border-woodBorder shadow-xl text-left space-y-3 relative overflow-hidden">
+                    <div class="flex justify-between items-start border-b border-woodBorder/60 pb-2">
+                        <div>
+                            <span class="text-[10px] font-bold bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">TE FITI VOYAGER</span>
+                            <h3 class="font-jua text-xl font-bold text-sandGold mt-0.5">
+                                <span id="cardNameTxt">모아나</span> 항해사의 서약
+                            </h3>
+                        </div>
+                        <svg class="w-7 h-7 heart-swirl" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#10B981" stroke-width="8"/>
+                            <path d="M50 20 C30 20 20 40 35 60 C45 72 50 80 50 80 C50 80 55 72 65 60 C80 40 70 20 50 20 Z" fill="#34D399"/>
+                        </svg>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-center text-xs">
+                        <div class="bg-oceanDeep/90 p-2 rounded-xl border border-slate-700">
+                            <span class="text-[10px] text-slate-400 block">목표 하루 배출량</span>
+                            <b id="cardDailyGoal" class="text-coralReef">19.3 kg</b>
+                        </div>
+                        <div class="bg-oceanDeep/90 p-2 rounded-xl border border-emerald-500/40">
+                            <span class="text-[10px] text-emerald-400 block">하루 감축 약속</span>
+                            <b id="cardDailyRed" class="text-emerald-300">3.2 kg</b>
+                        </div>
+                    </div>
+
+                    <div class="bg-oceanDeep/80 p-2.5 rounded-xl border border-woodBorder/40 text-[11px] space-y-1 text-slate-200">
+                        <span class="font-bold text-sandGold block">🌺 나의 탄소 감축 약속:</span>
+                        <p class="text-[10px] text-slate-300 leading-relaxed">"대중교통 이용과 에너지를 아끼는 실천으로 푸른 바다와 테 피티의 심장을 지키겠습니다!"</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <button onclick="copyPledge()" class="green-btn w-full py-3 text-white font-bold text-xs flex items-center justify-center gap-2">
+                        <span>📜 서약서 내용 복사하기</span>
+                    </button>
+                    <button onclick="goToSlide(1)" class="w-full py-2.5 bg-oceanDeep border border-slate-600 text-slate-300 font-bold text-xs rounded-full">
+                        🔄 처음부터 다시 항해하기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Information -->
+    <footer class="w-full max-w-2xl mx-auto text-center pb-2">
+        <p class="text-[11px] text-slate-500">
+            KOSIS 국가온실가스통계 (1인당 연간 13.68t → 하루 37.5kg CO₂ 기준) | THE HEART OF TE FITI
+        </p>
+    </footer>
+
+    <!-- Logic Engine -->
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 5;
+
+        const quizData = {
+            trans: 4.5,
+            energy: 6.5,
+            food: 7.0,
+            cup: 2.5,
+            digital: 2.0
+        };
+
+        let myDailyCO2 = 22.5;
+        const krDailyAvg = 37.5;
+        let chartInstance = null;
+
+        function updateDots() {
+            const dots = document.querySelectorAll('#pageDots .dot');
+            dots.forEach((dot, idx) => {
+                if (idx === currentSlide - 1) {
+                    dot.className = "dot w-5 h-3 rounded-full bg-coralReef transition-all duration-300";
+                } else {
+                    dot.className = "dot w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300";
+                }
+            });
+        }
+
+        function goToSlide(n) {
+            document.querySelectorAll('.slide-page').forEach(page => page.classList.remove('active'));
+            currentSlide = n;
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            updateDots();
+
+            if (currentSlide === 3) {
+                renderChart();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) goToSlide(currentSlide - 1);
+        }
+
+        function setQuiz(cat, val, btn) {
+            quizData[cat] = val;
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.q-btn').forEach(b => {
+                b.className = "q-btn border-2 border-slate-600 bg-oceanDeep/60 rounded-xl p-2.5 hover:border-coralReef";
+            });
+            btn.className = "q-btn border-2 border-emerald-400 bg-emerald-900/60 font-bold text-emerald-200 rounded-xl p-2.5";
+        }
+
+        function calculateAndNext() {
+            myDailyCO2 = quizData.trans + quizData.energy + quizData.food + quizData.cup + quizData.digital;
+            document.getElementById('myDailyVal').innerText = myDailyCO2.toFixed(1);
+
+            const ratio = ((myDailyCO2 / krDailyAvg) * 100).toFixed(0);
+            document.getElementById('comparisonResultText').innerHTML =
+                `대한민국 하루 평균(37.5kg) 대비 <b class="text-emerald-400">${ratio}%</b> 수준을 배출하고 있습니다! ⛵`;
+
+            let badge = "🌊 OCEAN WAYFINDER";
+            if (myDailyCO2 > 30) badge = "🌋 TE KĀ DANGER ZONE";
+            else if (myDailyCO2 > 20) badge = "⛵ CANOE SAILOR";
+            document.getElementById('badgePersona').innerText = badge;
+
+            runSim();
+            nextSlide();
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['나의 하루 배출량', '대한민국 하루 평균'],
+                    datasets: [{
+                        data: [myDailyCO2.toFixed(1), krDailyAvg],
+                        backgroundColor: ['#00B4D8', '#F4A261'],
+                        borderRadius: 12,
+                        barThickness: 32
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 50,
+                            ticks: { color: '#9CA3AF', callback: v => v + ' kg' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#F3F4F6' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function runSim() {
+            let red = 0;
+            if (document.getElementById('act1').checked) red += 2.0;
+            if (document.getElementById('act2').checked) red += 0.8;
+            if (document.getElementById('act3').checked) red += 0.3;
+            if (document.getElementById('act4').checked) red += 0.1;
+
+            document.getElementById('simReducedKg').innerText = red.toFixed(1);
+            const yearlyTrees = ((red * 365) / 6.6).toFixed(1);
+            document.getElementById('simTreeVal').innerText = yearlyTrees;
+
+            const goal = Math.max(0, myDailyCO2 - red).toFixed(1);
+            document.getElementById('cardDailyGoal').innerText = goal + ' kg';
+            document.getElementById('cardDailyRed').innerText = red.toFixed(1) + ' kg';
+        }
+
+        function updateCard() {
+            const name = document.getElementById('studentName').value.trim();
+            document.getElementById('cardNameTxt').innerText = name || '모아나';
+        }
+
+        function copyPledge() {
+            const name = document.getElementById('cardNameTxt').innerText;
+            const goal = document.getElementById('cardDailyGoal').innerText;
+            const red = document.getElementById('cardDailyRed').innerText;
+
+            const text = `[THE HEART OF TE FITI - WAYFINDER PLEDGE 📜]\n` +
+                `항해사: ${name}\n` +
+                `목표 하루 배출량: ${goal}\n` +
+                `하루 탄소 감축 약속: ${red}\n` +
+                `"KOSIS 국가 통계 비교와 실천으로 푸른 바다와 테 피티의 심장을 지키겠습니다!"`;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('서약 내용이 클립보드에 복사되었습니다! 📜');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const area = document.createElement('textarea');
+            area.value = text;
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand('copy');
+            document.body.removeChild(area);
+            alert('서약 내용이 클립보드에 복사되었습니다! 📜');
+        }
+
+        window.onload = function() {
+            runSim();
+        };
+    </script>
+</body>
+</html>
